@@ -1,0 +1,417 @@
+i want to have two jotform forms on one page. the issue is that the jotform source javacsript code has a eventlistener that disables any button once i submit my response. which code inside here is the issue and how do i fix this? the class is .form-submit-button
+
+please give me a solution and add it to the code, and reutrn me my code in final form
+
+----
+
+html element:
+
+before submit:
+
+<div id="cid_2" class="form-input-wide" data-layout="full">
+              <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_2" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField" data-component="button" data-content="" aria-live="polite">Subscribe</button></div>
+            </div>
+
+after submit:
+<li class="form-line" data-type="control_button" id="id_2">
+            <div id="cid_2" class="form-input-wide" data-layout="full">
+              <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_2" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField lastDisabled" data-component="button" data-content="" aria-live="polite" disabled="">Please wait...</button></div>
+            </div>
+          </li>
+
+js code parts from jotform's code:
+
+html element:
+
+before submit:
+
+<div id="cid_2" class="form-input-wide" data-layout="full">
+              <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_2" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField" data-component="button" data-content="" aria-live="polite">Subscribe</button></div>
+            </div>
+
+after submit:
+<li class="form-line" data-type="control_button" id="id_2">
+            <div id="cid_2" class="form-input-wide" data-layout="full">
+              <div data-align="auto" class="form-buttons-wrapper form-buttons-auto   jsTest-button-wrapperField"><button id="input_2" type="submit" class="form-submit-button submit-button jf-form-buttons jsTest-submitField lastDisabled" data-component="button" data-content="" aria-live="polite" disabled="">Please wait...</button></div>
+            </div>
+          </li>
+
+js code parts from jotform's code:
+
+enableDisableButtonsInMultiForms: function () {
+    var allButtons = $$(".form-submit-button");
+    allButtons.each(function (b) {
+      if (b.up("ul.form-section")) {
+        if (
+          b.up("ul.form-section").style.display == "none" ||
+          b.up("ul.form-section").hasClassName("js-non-displayed-page")
+        ) {
+          b.disable();
+        } else {
+          if (
+            b.className.indexOf("disabled") == -1 &&
+            !b.hasClassName("conditionallyDisabled")
+          ) {
+            b.enable();
+          }
+        }
+      }
+    });
+  },
+  enableButtons: function () {
+    setTimeout(function () {
+      $$(".form-submit-button").each(function (b) {
+        if (!b.hasClassName("conditionallyDisabled")) {
+          b.enable();
+        }
+        if (
+          b.innerHTML.indexOf("<img") === -1 &&
+          (b.type === "submit" || b.classList.contains("jsMobileSubmit"))
+        ) {
+          b.innerHTML = b.oldText2 || b.oldText || "Submit";
+        }
+      });
+    }, 60);
+  },
+  disableButtons: function () {
+    setTimeout(function () {
+      $$(".form-submit-button:not(.js-new-sacl-button)").each(function (b) {
+        if (
+          b.innerHTML.indexOf("<img") === -1 &&
+          (b.type === "submit" || b.classList.contains("jsMobileSubmit"))
+        ) {
+          if (!b.oldText2) {
+            b.oldText2 = b.innerHTML;
+          }
+          b.oldText = b.innerHTML;
+          b.innerHTML = JotForm.texts.pleaseWait;
+          b.ariaLabel = b.innerText;
+          b.ariaLive = "polite";
+        }
+        b.addClassName("lastDisabled");
+        b.disable();
+      });
+    }, 60);
+  },
+  setSubmitButtonActions: function () {
+    $$(
+      ".form-submit-button:not(.forReviewButton):not(.js-new-sacl-button), .forSubmit:not(.forReviewButton):not(.js-new-sacl-button)"
+    ).each(function (b) {
+      b.oldText = b.innerHTML;
+      b.ariaLive = "polite";
+      b.enable();
+      if (getQuerystring("qp") === "") {
+        b.observe("click", function (e) {
+          setTimeout(function () {
+            if (
+              !$$(".form-error-message")[0] &&
+              !$$(".form-textarea-limit-indicator-error")[0]
+            ) {
+              var allButtons = $$(
+                ".form-submit-button:not(.js-new-sacl-button)"
+              );
+              allButtons.each(function (bu) {
+                if (true) {
+                  if (
+                    (bu.innerHTML.indexOf("<img") === -1 &&
+                      bu.type === "submit") ||
+                    bu.classList.contains("jsMobileSubmit")
+                  ) {
+                    bu.oldText2 = bu.innerHTML;
+                    bu.innerHTML = JotForm.texts.pleaseWait;
+                  }
+                  bu.addClassName("lastDisabled");
+                  bu.disable();
+                }
+              });
+            }
+          }, 50);
+        });
+      }
+    });
+  },
+
+if (getQuerystring("nosubmit")) {
+          $$(".form-submit-button").each(function (b) {
+            b.disable();
+            b.addClassName("conditionallyDisabled");
+          });
+        }
+
+var constructSubmitBanner = function () {
+          var button = Array.from(
+            document.querySelectorAll(".form-submit-button")
+          ).find(function (el) {
+            return !(
+              el.hasClassName("form-sacl-button") ||
+              el.hasClassName("js-new-sacl-button")
+            );
+          });
+
+  var classNames = file.className.split(" ");
+      var buttonStyle = "";
+      $A(classNames).each(function (className) {
+        if (className.indexOf("form-submit-button-") === 0) {
+          buttonStyle = className;
+        }
+      });
+
+if (pages.length > 0) {
+      var allSections = document.querySelectorAll(
+        ".form-section:not([id^=section_])"
+      );
+      if (allSections.length > 0) {
+        last = allSections[allSections.length - 1];
+      }
+      if (last) {
+        last.pagesIndex = allSections.length;
+        pages.push(last);
+        last.style.display = "none";
+        var mergeWithSubmit = false;
+        var targetSubmit = null;
+        if (JotForm.newDefaultTheme || JotForm.extendsNewTheme) {
+          var submitButtons = last.querySelectorAll(
+            'li[data-type="control_button"] .form-buttons-wrapper'
+          );
+          if (submitButtons.length > 0) {
+            mergeWithSubmit = true;
+            targetSubmit = submitButtons[submitButtons.length - 1];
+            targetSubmit.classList.add("form-pagebreak");
+          }
+        }
+        var backCont = document.createElement("div");
+        backCont.className = "form-pagebreak-back-container";
+        var backButtonContainers = document.querySelectorAll(
+          ".form-pagebreak-back-container"
+        );
+        var back = backButtonContainers[0].querySelector("button");
+        var penultimateBack =
+          backButtonContainers[backButtonContainers.length - 1].querySelector(
+            "button"
+          );
+        var isHiddenButton =
+          penultimateBack.classList.contains("button-hidden");
+        back.textContent = penultimateBack
+          ? penultimateBack.textContent
+          : back.textContent;
+        back.className = back.className.replace(
+          /\bform-submit-button-\S+/g,
+          ""
+        );
+        var classList = [];
+        var submitButtonElement = document.querySelector(
+          'li[data-type="control_button"] .submit-button'
+        );
+        if (submitButtonElement) {
+          if (isHiddenButton) {
+            submitButtonElement.classList.add("button-hidden");
+          }
+          submitButtonElement.classList.forEach((cls) => {
+            if (
+              cls.startsWith("form-submit-button-") ||
+              cls == "button-hidden"
+            ) {
+              back.setAttribute(
+                "class",
+                cls + " form-pagebreak-back jf-form-buttons"
+              );
+            }
+          });
+
+if (errors) {
+          Event.stop(event);
+          setTimeout(function () {
+            erroredFields.forEach(function (input) {
+              JotForm.errored(input, errors);
+            });
+            var cc_number = $$(".cc_number")[0];
+            if (
+              !cc_number.isVisible() &&
+              !cc_number.up("li").hasClassName("form-field-hidden") &&
+              !cc_number.up("ul").hasClassName("form-field-hidden") &&
+              $$("ul.form-section.page-section").length > 1
+            ) {
+              var visibleButtons = [];
+              $$(".form-submit-button").each(function (btn) {
+                if (btn.isVisible()) {
+                  visibleButtons.push(btn);
+                }
+              });
+              if (visibleButtons.length < 1) {
+                return;
+              }
+              var lastButton = visibleButtons[visibleButtons.length - 1];
+              $$(".form-card-error").invoke("remove");
+              var errorBox = new Element("div", {
+                className: "form-button-error form-card-error",
+              });
+              errorBox.insert("<p>" + errors + "</p>");
+              $(lastButton.parentNode.parentNode).insert(errorBox);
+            }
+            JotForm.enableButtons();
+          }, 500);
+        }
+      }
+    });
+  },
+
+hideButtonMessage: function () {
+    if (window.FORM_MODE == "cardform") {
+      $$(".form-submit-button").each(function (button) {
+        var buttonParentNode = button.parentNode.parentNode;
+        var errorBox = buttonParentNode.select(".form-button-error")[0];
+        if (errorBox && buttonParentNode.hasClassName("jfCard")) {
+          var buttonParentNodeRect = buttonParentNode.getBoundingClientRect();
+          var errorBoxRect = errorBox.getBoundingClientRect();
+          var qContainer = buttonParentNode.select(".jfCard-question")[0];
+          if (qContainer) {
+            var qContainerRect = qContainer.getBoundingClientRect(qContainer);
+            buttonParentNode.style.maxHeight =
+              buttonParentNodeRect.height + errorBoxRect.height;
+            qContainer.style.maxHeight =
+              qContainerRect.height + errorBoxRect.height;
+            buttonParentNode.parentNode.style.paddingBottom = "unset";
+          }
+        }
+      });
+    }
+    $$(".form-button-error").invoke("remove");
+  },
+  showButtonMessage: function (txt) {
+    this.hideButtonMessage();
+    $$(".form-submit-button").each(function (button) {
+      if (JotForm.isSourceTeam) {
+        return;
+      }
+      if (
+        button &&
+        button.getAttribute("class").indexOf("form-sacl-button") > -1
+      ) {
+        return;
+      }
+      var errorBox = new Element("div", {
+        className: "form-button-error",
+        role: "alert",
+      });
+      errorBox.insert(
+        "<p>" +
+          (typeof txt !== "undefined" ? txt : JotForm.texts.generalError) +
+          "</p>"
+      );
+      var buttonParentNode = button.parentNode.parentNode;
+      $(buttonParentNode).insert(errorBox);
+      if (buttonParentNode.hasClassName("jfCard")) {
+        var buttonParentNodeRect = buttonParentNode.getBoundingClientRect();
+        var progressWrapper = document.querySelector("#cardProgress");
+        var progressRect = progressWrapper.getBoundingClientRect();
+        var errorBoxRect = errorBox.getBoundingClientRect();
+        if (
+          errorBoxRect.bottom > progressRect.top &&
+          getComputedStyle(progressWrapper).display !== "none"
+        ) {
+          var qContainer = buttonParentNode.select(".jfCard-question")[0];
+          if (qContainer) {
+            var qContainerRect = qContainer.getBoundingClientRect(qContainer);
+            buttonParentNode.style.maxHeight =
+              buttonParentNodeRect.height - errorBoxRect.height;
+            qContainer.style.maxHeight =
+              qContainerRect.height - errorBoxRect.height;
+            buttonParentNode.parentNode.style.paddingBottom =
+              errorBoxRect.height;
+          }
+        }
+      }
+    });
+  },
+  _errTimeout: null,
+
+if (
+            $$(".form-submit-button") &&
+            $$(".form-submit-button").length > 0
+          ) {
+            var aSubmitIsVisible = false;
+            $$(".form-submit-button").each(function (el) {
+              if (JotForm.isVisible(el.parentNode)) {
+                aSubmitIsVisible = true;
+                return;
+              }
+            });
+
+if (!JotForm.validateAll(form)) {
+            JotForm.enableButtons();
+            JotForm.showButtonMessage();
+            JotForm.updateErrorNavigation(true);
+            if (JotForm.submitError) {
+              if (JotForm.submitError == "jumpToSubmit") {
+                var visSubmit = [];
+                $$(".form-submit-button").each(function (but) {
+                  if (JotForm.isVisible(but)) {
+                    visSubmit.push(but);
+                  }
+                });
+                if (visSubmit.length > 0) {
+                  if (visSubmit[visSubmit.length - 1].up(".form-line")) {
+                    visSubmit[visSubmit.length - 1]
+                      .up(".form-line")
+                      .scrollIntoView(false);
+                  } else {
+                    visSubmit[visSubmit.length - 1].scrollIntoView(false);
+                  }
+                }
+              } else if (JotForm.submitError == "jumpToFirstError") {
+                setTimeout(function () {
+                  JotForm.setPagePositionForError();
+                }, 100);
+              }
+            }
+
+$$(".form-submit-button").each(function (btn) {
+      btn.setStyle({ "pointer-events": "none", opacity: "0.3" });
+    });
+
+my script:
+
+<script>
+// Get all form elements on the page
+var forms = document.getElementsByTagName('form');
+
+// Loop over each form
+Array.from(forms).forEach(function(form) {
+    // Create a new iframe element
+    var iframe = document.createElement('iframe');
+
+    // Set the iframe's properties
+    iframe.name = 'invisible_iframe_' + form.id;
+    iframe.id = 'invisible_iframe_' + form.id;
+    iframe.style.display = 'none';
+    iframe.className = 'invisible_iframe'; // Add a class to the iframe
+
+    // Append the iframe directly after the form
+    form.insertAdjacentElement('afterend', iframe);
+
+    // Set the form's target to the ID of the iframe
+    form.target = iframe.id;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Get the form and iframe elements
+        var formContainer = this; // 'this' refers to the form being submitted
+        var iframe = document.getElementById('invisible_iframe_' + this.id);
+
+        // Listen for the iframe to load
+        iframe.addEventListener('load', function() {
+            // Once the iframe is loaded, hide the form and show the iframe
+            formContainer.style.display = 'none';
+            iframe.style.display = 'block';
+        });
+
+        // Continue with the form submission
+        this.submit();
+    });
+});
+
+
+
+    </script>
+
